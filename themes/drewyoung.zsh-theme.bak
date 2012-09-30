@@ -1,0 +1,230 @@
+########################
+#         utils        #
+########################
+                       #
+bold=${(%):-%B}        #
+                       #
+# End utils            #
+########################
+
+#########################
+#         path          #
+#########################
+
+function path() {
+	local p orig length cut
+	
+	p=${p:-$(pwd)}
+	p=$(echo $p | sed -e "s,^$HOME,~,")
+	orig=$p
+	p=(${(s:/:)p})
+	length=${#p}
+	
+	if [[ $length > 1 && ( $p[1] != '~' || $length > 2 ) ]]; then
+		cut="yes"
+		p=$p[$length]
+	fi
+	
+	p=${(j:/:)p}
+	
+	if [[ $orig[1] = "/" && $cut != "yes" ]]; then
+		p="/$p"
+	else
+		if [[ $orig[1] = '~' && $cut != "yes" && $length > 1 ]]; then
+			p='~ '$p[3,-1]
+		fi
+	fi
+	
+	echo $p
+}
+
+# End path
+##################
+
+#########################
+#        prompt2        #
+######################################
+                                     #
+function prompt2() { ##################################################
+	local r length output            # Declare variables              #
+	r=${(%):-%_}                     # Get the reason for this prompt #
+	length=${#r}                     # And it's length                #
+	                                 #                                #
+	if [[ $length != 0 ]]; then      # If `$r` is something actually  #
+		output="$r"                  # Use `$r`                       #
+	else                             # Otherwise                      #
+		output="\\"                  # Use a good default of \        #
+	fi                               #                                #
+	                                 #                                #
+	echo $fg[red]$output$reset_color # Echo it out in red             #
+} ####################################################################
+                                     #
+# End prompt2                        #
+######################################
+
+    ############################
+    #         git_prompt       #
+###########################################################################
+                                                                           #
+###########################                                                #
+#  git_prompt_info config #                                                #
+###########################                                                #
+# Formated for an array   #                                                #
+# Should output something #                                                #
+# like `master clean`     #                                                #
+###########################                                                #
+#  code                   ###############                                  #
+	ZSH_THEME_GIT_PROMPT_PREFIX=""      #                                  #
+	ZSH_THEME_GIT_PROMPT_CLEAN=" clean" #                                  #
+	ZSH_THEME_GIT_PROMPT_DIRTY=" dirty" #                                  #
+	ZSH_THEME_GIT_PROMPT_SUFFIX=""      #                                  #
+#  end                    ###############                                  #
+###########################                                                #
+                                                                           #
+##############################                                             #
+#  git_prompt_status config  #                                             #
+##############################                                             #
+# Formated for an array      #                                             #
+# Should output something    #                                             #
+# Like `untracked modified`  #                                             #
+##############################                                             #
+#  code                      ####################                          #
+	ZSH_THEME_GIT_PROMPT_UNTRACKED=" untracked" #                          #
+	ZSH_THEME_GIT_PROMPT_ADDED=" added"         #                          #
+	ZSH_THEME_GIT_PROMPT_MODIFIED=" modified"   #                          #
+	ZSH_THEME_GIT_PROMPT_RENAMED=" renamed"     #                          #
+	ZSH_THEME_GIT_PROMPT_DELETED=" deleted"     #                          #
+	ZSH_THEME_GIT_PROMPT_UNMERGED=" unmerged"   #                          #
+#  end                       ####################                          #
+##############################                                             #   #################
+                                                                           #   #   Line Docs   #
+function git_prompt() { ##############################################################################################################################
+	local info info_length long_sha short_sha gstatus gstatusa output      # Define variables                                                        #
+	                                                                       #                                                                         #
+#	typeset -A gstatus                                                     # Make `$gstatus` an associative array                                    #
+	                                                                       #                                                                         #
+	info=($(git_prompt_info))                                              # Get the info                                                            #
+#	gstatusa=($(git_prompt_status))                                        # Get the status                                                          #
+#	gstatus=()                                                             # Initialize `$gstatus` (`$gstatusa` will be copied in to this (sort of)  #
+	info_length=${#info}                                                   # Get the length of the info                                              #
+#	long_sha="$(git_prompt_long_sha)"                                      # Get the long sha                                                        #
+#	short_sha="$(git_prompt_short_sha)"                                    # Get the short sha                                                       #
+	                                                                       #                                                                         #
+#	for name in $gstatusa; do                                              # Loop through the status                                                 #
+#		gstatus[$name]=0                                                   # Mark it as found/gotten/a-file-is-marked-as-this                        #
+#	done                                                                   #                                                                         #
+	                                                                       #                                                                         #
+	#echo ${(k)gstatus}                                                    #                                                                         #
+	                                                                       #                                                                         #
+	if [[ $info_length > 0 ]]; then                                        # If we're in a git repo                                                  #
+		                                                                   # Well we're in a git repo                                                #
+		output+=$fg[magenta]'('$bold$fg[green]$info[1]$reset_color         # Magenta open-parenthese then bold green branch name                     #
+		                                                                   #                                                                         #
+#		if   [[ $gstatus[untracked] = 0 || $gstatus[deleted]  = 0 ]]; then # New or Deleted file                                                     #
+#			output+=$bold$fg[red]'●'$reset_color                           # Filled red circle                                                       #
+#		elif [[ $gstatus[renamed]   = 0 || $gstatus[modified] = 0 ]]; then # Renamed or Modified file                                                #
+#			output+=$bold$fg[red]'◍'$reset_color                           # Red circle with lines                                                   #
+#		elif [[ $gstatus[added]     = 0                           ]]; then # Changes committed                                                       #
+#			output+=$bold$fg[red]'◎'$reset_color                           # Red circle with waves                                                   #
+#		elif [[ $info[2] = 'clean'                                ]]; then # No changes                                                              #
+#			output+=$bold$fg[green]'○'$reset_color                         # Empty green circle                                                      #
+#		else                                                               # Otherwise                                                               #
+#			echo "ERROR got to else in git_prompt"                         # BLOW UP!!!                                                              #
+#			                                                               # Because there's nothing untracked, deleted, renamed, modified or added  #
+#		fi                                                                 #                                                                         #
+		                                                                   #                                                                         #
+		case $info[2] in                                                   # Check if its clean or dirty                                             #
+			(clean) output+=$bold$fg[red]'○'$reset_color                   # Clean => Empty green circle                                             #
+				    ;;                                                     #                                                                         #
+			(dirty) output+=$bold$fg[green]'●'$reset_color                 # Dirty => Filled red circle                                              #
+				    ;;                                                     #                                                                         #
+			(*)     echo "ERROR: got to (*) in git_prompt"                 # Otherwise                                                               #
+				    return 1                                               # BLOW UP!!!                                                              #
+					;;                                                     # Because it's not clean and it's not dirty                               #
+		esac                                                               #                                                                         #
+		                                                                   #                                                                         #
+		output+=$fg[magenta]")$reset_color"                                # Finish it up (close-parenthese)                                         #
+	fi                                                                     #                                                                         #
+	                                                                       #                                                                         #
+	echo $output                                                           # Output the `$output`                                                    #
+} ####################################################################################################################################################
+                                                                           #
+# End git_prompt                                                           #
+############################################################################
+
+function preexec() {
+	echo ${(%):-%b} # Clear bold
+}
+
+###############################################################
+#                          $PROMPT                            #
+#### Lines                                                    #
+# Username with color (red for root, green for everyone else) #
+# Current dir (see path) and git data                         #
+# '#' for root, '»' for everyone else                         #
+######################################################################
+                                                               
+PROMPT='%B%(!.%{$fg[red]%}.%{$fg[green]%})%n%{$reset_color%}:\
+ %{$fg[magenta]%}%{$(path)%}%{$reset_color%}%{$(git_prompt_info)%}\
+ %{$fg[red]%}%(!.#.»)%{$reset_color%}%B '
+
+ZSH_THEME_GIT_PROMPT_PREFIX="${fg[magenta]}($reset_color$bold${fg[green]}"
+ZSH_THEME_GIT_PROMPT_CLEAN="$reset_color$bold${fg[green]}○$reset_color"
+ZSH_THEME_GIT_PROMPT_DIRTY="$reset_color$bold${fg[red]}●$reset_color"
+ZSH_THEME_GIT_PROMPT_SUFFIX="$reset_color${fg[magenta]})"
+
+# End $PROMPT
+#####################################################################
+
+###################
+##   $PROMPT2    ##
+#   See prompt2   #
+##########################
+                         #
+PROMPT2='%{$(prompt2)%}' #
+                         #
+# End $PROMPT2           #
+##########################
+
+#ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[yellow]%}("
+#ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}○%{$reset_color%}"
+#ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}⚡%{$reset_color%}"
+#ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg[yellow]%})%{$reset_color%}"
+
+#function path() {
+#	local p orig length sliced
+#	p=${1:-$(pwd)}
+#	p=$(echo $p | sed -e "s,^$HOME,~,")
+#	orig=(${(s::)p})
+#	p=(${(s:/:)p})
+#	length=${#p}
+#	
+#	if [[ $length > 2 && ($p[1] != "~" || $length > 3) ]]; then
+#		sliced="yes"
+#		p=($p[$(( $length - 1 )),-1])
+#	fi
+#	
+#	p=${(j./.)p}
+#	
+#	if [[ $orig[1] = "/" && $sliced != "yes" ]]; then
+#		p="/$p"
+#	fi
+#	
+#	echo "$p"
+#}
+
+#PROMPT='╭─%B%{$fg[green]%}%n%{$reset_color%}@%{$fg[cyan]%}%m\
+#%{$reset_color%}:%{$fg[magenta]%}%{$(path)%}%{$reset_color%}
+#╰─%{$(git_prompt_info)%} \
+#%{$fg[red]%}%(!.#.»)%{$reset_color%} %B'
+#PROMPT2='%{$fg[red]%}\ %{$reset_color%}'
+#PROMPT2='%{$fg[red]%}%_ %{$reset_color%}'
+#RPS1='%B\
+#%(?.%{$fg[green]%}.%{$fg[red]%})\
+#%? ↵%{$reset_color%}'
+#RPS2='%{$fg[red]%}<-- continue%{$reset_color%}'
+#
+#ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[yellow]%}("
+#ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[green]%}○%{$reset_color%}"
+#ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}⚡%{$reset_color%}"
+#ZSH_THEME_GIT_PROMPT_SUFFIX="%{$fg[yellow]%})%{$reset_color%}"
